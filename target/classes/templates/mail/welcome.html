@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{mail/layout}">
+<body>
+    <div layout:fragment="content">
+        <h2>欢迎加入庐山杏林中药植物研究所</h2>
+        
+        <p>亲爱的 <strong th:text="${username}">用户</strong>，</p>
+        
+        <p>欢迎您成为庐山杏林中药植物研究所网站的会员！我们很高兴能与您一起探索中药植物的奥秘。</p>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #2F855A; margin-top: 0;">您可以享受以下服务：</h3>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+                <li style="margin: 10px 0;">
+                    <i class="fas fa-leaf" style="color: #2F855A;"></i>
+                    探索杏林花园的珍稀植物
+                </li>
+                <li style="margin: 10px 0;">
+                    <i class="fas fa-book" style="color: #2F855A;"></i>
+                    阅读专业的植物研究文章
+                </li>
+                <li style="margin: 10px 0;">
+                    <i class="fas fa-graduation-cap" style="color: #2F855A;"></i>
+                    参与科学培训和教育活动
+                </li>
+                <li style="margin: 10px 0;">
+                    <i class="fas fa-shopping-cart" style="color: #2F855A;"></i>
+                    购买优质的中药材产品
+                </li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://localhost:8080" class="button" style="color: white;">
+                立即访问网站
+            </a>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #2F855A; margin-top: 0;">快速入门：</h3>
+            <ol style="margin: 0; padding-left: 20px;">
+                <li>完善您的个人资料</li>
+                <li>浏览杏林花园的植物介绍</li>
+                <li>关注我们的最新研究动态</li>
+                <li>参与线上或线下的培训活动</li>
+            </ol>
+        </div>
+
+        <div class="note">
+            <h3 style="color: #2F855A;">关注我们：</h3>
+            <p>
+                官方微信：lushanxinglin<br>
+                官方微博：@庐山杏林<br>
+                电话：0792-XXXXXXXX<br>
+                邮箱：contact@lushan-garden.com
+            </p>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <p>
+                如果您有任何问题或建议，欢迎随时与我们联系。<br>
+                祝您使用愉快！
+            </p>
+            
+            <p>
+                此致<br>
+                庐山杏林中药植物研究所团队
+            </p>
+        </div>
+
+        <div style="font-size: 12px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p>
+                您收到此邮件是因为您在庐山杏林中药植物研究所网站注册了账号。<br>
+                如果您没有注册，请忽略此邮件。
+            </p>
+        </div>
+    </div>
+</body>
+</html>
