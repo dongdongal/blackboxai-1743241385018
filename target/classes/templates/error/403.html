@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="#{error.403.title}">访问受限</title>
+</head>
+<body>
+    <div layout:fragment="content" class="min-h-[500px] flex items-center justify-center">
+        <div class="text-center">
+            <div class="mb-8">
+                <i class="fas fa-lock text-8xl text-gray-300"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">403</h1>
+            <p class="text-xl text-gray-600 mb-4" th:text="#{error.403.message}">
+                抱歉，您没有权限访问此页面
+            </p>
+            
+            <!-- 未登录提示 -->
+            <div th:if="${#authorization.expression('!isAuthenticated()')}" class="mb-8">
+                <p class="text-gray-600 mb-4">请先登录后再访问此页面</p>
+                <a th:href="@{/login}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    <span>登录</span>
+                </a>
+            </div>
+            
+            <!-- 已登录但权限不足提示 -->
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="mb-8">
+                <p class="text-gray-600">
+                    当前用户：<span class="font-medium" sec:authentication="name"></span>
+                </p>
+                <p class="text-gray-600 mt-2">
+                    如需访问此页面，请联系管理员获取相应权限
+                </p>
+            </div>
+
+            <div class="space-x-4">
+                <a href="javascript:history.back()" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span th:text="#{common.back}">返回</span>
+                </a>
+                <a th:href="@{/}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                    <i class="fas fa-home mr-2"></i>
+                    <span>首页</span>
+                </a>
+            </div>
+
+            <!-- 联系管理员卡片 -->
+            <div class="mt-12 max-w-md mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <i class="fas fa-headset mr-2 text-gray-400"></i>
+                    需要帮助？
+                </h3>
+                <p class="text-gray-600 mb-4">
+                    如果您认为这是一个错误，或需要获取访问权限，请联系系统管理员：
+                </p>
+                <div class="text-left space-y-2">
+                    <p class="text-gray-600">
+                        <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                        邮箱：admin@lushan-garden.com
+                    </p>
+                    <p class="text-gray-600">
+                        <i class="fas fa-phone mr-2 text-gray-400"></i>
+                        电话：0792-XXXXXXXX
+                    </p>
+                    <p class="text-gray-600">
+                        <i class="fas fa-clock mr-2 text-gray-400"></i>
+                        工作时间：周一至周五 9:00-17:00
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 权限提示对话框 -->
+    <div class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-md"
+         x-data="{ show: true }"
+         x-show="show">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-medium text-gray-900">权限提示</h3>
+            <button @click="show = false" class="text-gray-400 hover:text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">
+            您当前的用户权限不足以访问此页面。如需访问，请联系管理员升级您的权限。
+        </p>
+        <div class="text-right">
+            <button @click="show = false"
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                知道了
+            </button>
+        </div>
+    </div>
+</body>
+</html>
