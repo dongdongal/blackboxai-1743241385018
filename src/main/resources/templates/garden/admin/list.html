@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>杏林花园管理</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- 页面标题和添加按钮 -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">杏林花园管理</h1>
+            <a th:href="@{/garden/admin/form}" 
+               class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <i class="fas fa-plus mr-2"></i>
+                添加花园
+            </a>
+        </div>
+
+        <!-- 搜索和筛选 -->
+        <div class="bg-white p-4 rounded-lg shadow mb-6">
+            <form th:action="@{/garden/admin}" method="get" class="flex gap-4">
+                <input type="text" name="keyword" th:value="${keyword}"
+                       class="flex-1 rounded-lg border-gray-300"
+                       placeholder="搜索花园名称...">
+                <select name="category" class="rounded-lg border-gray-300">
+                    <option value="">所有类别</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat}"
+                            th:text="${cat}"
+                            th:selected="${cat == currentCategory}">
+                    </option>
+                </select>
+                <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-search mr-2"></i>搜索
+                </button>
+            </form>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类别</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">排序</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="garden : ${gardens}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-10 w-10 flex-shrink-0">
+                                    <img th:if="${garden.imageUrl}" 
+                                         th:src="${garden.imageUrl}"
+                                         class="h-10 w-10 rounded-full object-cover">
+                                    <div th:unless="${garden.imageUrl}"
+                                         class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-image text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${garden.name}"></div>
+                                    <div class="text-sm text-gray-500" th:text="${garden.nameEn}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                                  th:text="${garden.category}">
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <input type="number" th:value="${garden.sortOrder}"
+                                   th:data-id="${garden.id}"
+                                   class="w-20 rounded border-gray-300 sort-order"
+                                   onchange="updateSortOrder(this)">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" 
+                                       th:id="'toggle-' + ${garden.id}"
+                                       th:checked="${garden.isPublished}"
+                                       th:data-id="${garden.id}"
+                                       class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+                                       onchange="updatePublishStatus(this)"/>
+                                <label th:for="'toggle-' + ${garden.id}"
+                                       class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer">
+                                </label>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a th:href="@{/garden/admin/form(id=${garden.id})}"
+                               class="text-indigo-600 hover:text-indigo-900 mr-4">
+                                <i class="fas fa-edit"></i> 编辑
+                            </a>
+                            <button th:data-id="${garden.id}"
+                                    onclick="deleteGarden(this)"
+                                    class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <div th:if="${gardens.totalPages > 1}" class="mt-6 flex justify-center">
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <a th:each="i : ${#numbers.sequence(0, gardens.totalPages - 1)}"
+                   th:href="@{/garden/admin(page=${i})}"
+                   th:text="${i + 1}"
+                   th:class="${i == gardens.number ? 'bg-green-50 border-green-500 text-green-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'}">
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 页面特定的JavaScript -->
+    <th:block layout:fragment="scripts">
+        <script>
+            async function updateSortOrder(input) {
+                const id = input.dataset.id;
+                const sortOrder = input.value;
+                
+                try {
+                    const response = await fetch(`/garden/admin/sort/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `sortOrder=${sortOrder}`
+                    });
+                    
+                    if (!response.ok) throw new Error('更新失败');
+                    
+                    // 成功提示
+                    alert('排序更新成功');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('更新失败：' + error.message);
+                }
+            }
+
+            async function updatePublishStatus(checkbox) {
+                const id = checkbox.dataset.id;
+                const isPublished = checkbox.checked;
+                
+                try {
+                    const response = await fetch(`/garden/admin/publish/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `isPublished=${isPublished}`
+                    });
+                    
+                    if (!response.ok) throw new Error('更新失败');
+                    
+                    // 成功提示
+                    alert('状态更新成功');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('更新失败：' + error.message);
+                    // 恢复复选框状态
+                    checkbox.checked = !checkbox.checked;
+                }
+            }
+
+            async function deleteGarden(button) {
+                if (!confirm('确定要删除这个花园吗？')) return;
+                
+                const id = button.dataset.id;
+                
+                try {
+                    const response = await fetch(`/garden/admin/delete/${id}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) throw new Error('删除失败');
+                    
+                    // 删除成功后刷新页面
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('删除失败：' + error.message);
+                }
+            }
+        </script>
+        <style>
+            /* 开关按钮样式 */
+            .toggle-checkbox:checked {
+                right: 0;
+                border-color: #68D391;
+            }
+            .toggle-checkbox:checked + .toggle-label {
+                background-color: #68D391;
+            }
+        </style>
+    </th:block>
+</body>
+</html>
