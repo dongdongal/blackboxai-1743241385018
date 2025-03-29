@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>注册 - 庐山杏林中药植物研究所</title>
+</head>
+<body>
+    <div layout:fragment="content" class="min-h-[600px] flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">注册新账号</h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    已有账号？
+                    <a th:href="@{/login}" class="font-medium text-green-600 hover:text-green-500">
+                        立即登录
+                    </a>
+                </p>
+            </div>
+
+            <!-- 注册表单 -->
+            <form class="mt-8 space-y-6" th:action="@{/register}" method="POST" id="registerForm">
+                <!-- 错误消息 -->
+                <div th:if="${error}" class="rounded-md bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800" th:text="${error}">
+                                注册失败
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-md shadow-sm space-y-4">
+                    <!-- 用户名 -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700">用户名</label>
+                        <input id="username" 
+                               name="username" 
+                               type="text" 
+                               required 
+                               class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="请输入用户名">
+                    </div>
+
+                    <!-- 邮箱 -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">邮箱</label>
+                        <input id="email" 
+                               name="email" 
+                               type="email" 
+                               required 
+                               class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="请输入邮箱">
+                    </div>
+
+                    <!-- 手机号 -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">手机号</label>
+                        <div class="mt-1 flex rounded-md shadow-sm">
+                            <input id="phone" 
+                                   name="phone" 
+                                   type="tel" 
+                                   required 
+                                   class="flex-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                                   placeholder="请输入手机号">
+                            <button type="button" 
+                                    onclick="sendVerificationCode()"
+                                    class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500">
+                                获取验证码
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 验证码 -->
+                    <div>
+                        <label for="verificationCode" class="block text-sm font-medium text-gray-700">验证码</label>
+                        <input id="verificationCode" 
+                               name="verificationCode" 
+                               type="text" 
+                               required 
+                               class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="请输入验证码">
+                    </div>
+
+                    <!-- 密码 -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
+                        <input id="password" 
+                               name="password" 
+                               type="password" 
+                               required 
+                               class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="请输入密码">
+                    </div>
+
+                    <!-- 确认密码 -->
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
+                        <input id="confirmPassword" 
+                               name="confirmPassword" 
+                               type="password" 
+                               required 
+                               class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" 
+                               placeholder="请再次输入密码">
+                    </div>
+                </div>
+
+                <!-- 用户协议 -->
+                <div class="flex items-center">
+                    <input id="agree-terms" 
+                           name="agree-terms" 
+                           type="checkbox" 
+                           required
+                           class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                    <label for="agree-terms" class="ml-2 block text-sm text-gray-900">
+                        我已阅读并同意
+                        <a href="#" class="font-medium text-green-600 hover:text-green-500">用户协议</a>
+                        和
+                        <a href="#" class="font-medium text-green-600 hover:text-green-500">隐私政策</a>
+                    </label>
+                </div>
+
+                <!-- 注册按钮 -->
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-user-plus text-green-500 group-hover:text-green-400"></i>
+                        </span>
+                        注册
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 页面特定的JavaScript -->
+    <th:block layout:fragment="scripts">
+        <script>
+            // 发送验证码
+            function sendVerificationCode() {
+                const phone = document.getElementById('phone').value;
+                if (!phone) {
+                    alert('请输入手机号');
+                    return;
+                }
+                
+                // TODO: 调用发送验证码接口
+                alert('验证码已发送，请注意查收');
+            }
+
+            // 表单验证
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('两次输入的密码不一致');
+                    return;
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>
