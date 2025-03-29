@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>杏林花园</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- 页面标题 -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900" th:text="#{garden.title}">杏林花园</h1>
+            <p class="mt-2 text-gray-600" th:text="#{garden.description}">
+                探索我们丰富多样的植物园区，感受大自然的魅力
+            </p>
+        </div>
+
+        <!-- 搜索和筛选区 -->
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row gap-4">
+                <!-- 搜索框 -->
+                <div class="flex-1">
+                    <form th:action="@{/garden}" method="get" class="flex gap-2">
+                        <input type="text" name="keyword" th:value="${keyword}"
+                               class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                               th:placeholder="#{garden.search.placeholder}">
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- 类别筛选 -->
+                <div class="flex-none">
+                    <select name="category" onchange="window.location.href='?category=' + this.value"
+                            class="w-full md:w-48 rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                        <option value="" th:text="#{garden.category.all}">所有类别</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat}"
+                                th:text="${cat}"
+                                th:selected="${cat == currentCategory}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 花园列表 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 花园卡片 -->
+            <div th:each="garden : ${gardens}" 
+                 class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                
+                <!-- 图片区域 -->
+                <div class="relative aspect-w-16 aspect-h-9">
+                    <img th:if="${garden.imageUrl}" 
+                         th:src="${garden.imageUrl}"
+                         th:alt="${garden.name}"
+                         class="object-cover w-full h-full">
+                    <div th:unless="${garden.imageUrl}" 
+                         class="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-image text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 内容区域 -->
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold mb-2">
+                        <a th:href="@{/garden/{id}(id=${garden.id})}" 
+                           th:text="${#locale.language=='zh' ? garden.name : garden.nameEn}"
+                           class="text-gray-900 hover:text-green-600">
+                        </a>
+                    </h3>
+                    
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-3" 
+                       th:text="${#locale.language=='zh' ? garden.description : garden.descriptionEn}">
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500" th:text="${garden.category}"></span>
+                        <a th:href="@{/garden/{id}(id=${garden.id})}" 
+                           class="text-green-600 hover:text-green-700 text-sm font-medium">
+                            <span th:text="#{garden.readMore}">了解更多</span>
+                            <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div th:if="${gardens.totalPages > 1}" class="mt-8 flex justify-center">
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <!-- 上一页 -->
+                <a th:href="@{/garden(page=${gardens.number - 1}, size=${gardens.size}, category=${currentCategory}, keyword=${keyword})}"
+                   th:class="${gardens.first ? 'pointer-events-none bg-gray-100' : 'hover:bg-gray-50'}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                    <span class="sr-only">上一页</span>
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                
+                <!-- 页码 -->
+                <th:block th:each="i : ${#numbers.sequence(0, gardens.totalPages - 1)}">
+                    <a th:href="@{/garden(page=${i}, size=${gardens.size}, category=${currentCategory}, keyword=${keyword})}"
+                       th:text="${i + 1}"
+                       th:class="${i == gardens.number ? 'bg-green-50 border-green-500 text-green-600 z-10' : 'hover:bg-gray-50'}"
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    </a>
+                </th:block>
+                
+                <!-- 下一页 -->
+                <a th:href="@{/garden(page=${gardens.number + 1}, size=${gardens.size}, category=${currentCategory}, keyword=${keyword})}"
+                   th:class="${gardens.last ? 'pointer-events-none bg-gray-100' : 'hover:bg-gray-50'}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                    <span class="sr-only">下一页</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 无数据提示 -->
+        <div th:if="${gardens.empty}" class="text-center py-12">
+            <i class="fas fa-leaf text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500" th:text="#{garden.noData}">暂无花园信息</p>
+        </div>
+    </div>
+</body>
+</html>
